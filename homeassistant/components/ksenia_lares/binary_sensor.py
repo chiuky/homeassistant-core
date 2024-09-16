@@ -38,9 +38,24 @@ async def async_setup_entry(
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
+    def addLaresBinarySensor(coordinator, idx, zone, zone_descriptions, device_info):
+        """Add lares sensor based on the logic."""
+        if zone is not None and zone["status"] != ZONE_STATUS_NOT_USED:
+            LaresBinarySensor(coordinator, idx, zone_descriptions[idx], device_info)
+        else:
+            _LOGGER.info(
+                f"The zone {idx} is None or not used so has been not added to homeassistant"  # noqa: G004
+            )
+
+    zones = coordinator.data[DATA_ZONES]
+    zones = filter(
+        lambda c: c is not None and c["status"] != ZONE_STATUS_NOT_USED, zones
+    )
+
     async_add_entities(
         LaresBinarySensor(coordinator, idx, zone_descriptions[idx], device_info)
-        for idx, zone in enumerate(coordinator.data[DATA_ZONES])
+        # addLaresBinarySensor(coordinator, idx, zone, zone_descriptions, device_info)
+        for idx, zone in enumerate(zones)
     )
 
 

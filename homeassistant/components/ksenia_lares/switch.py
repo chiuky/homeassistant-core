@@ -39,11 +39,16 @@ async def async_setup_entry(
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
+    zones = coordinator.data[DATA_ZONES]
+    zones = filter(
+        lambda c: c is not None and c["status"] != ZONE_STATUS_NOT_USED, zones
+    )
+
     async_add_entities(
         LaresBypassSwitch(
             coordinator, idx, zone_descriptions[idx], device_info, options
         )
-        for idx, zone in enumerate(coordinator.data[DATA_ZONES])
+        for idx, zone in enumerate(zones)
     )
 
 
