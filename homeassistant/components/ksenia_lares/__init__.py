@@ -17,7 +17,6 @@ PLATFORMS = [
     Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
     Platform.SWITCH,
-    Platform.WEATHER,
 ]
 
 
@@ -72,7 +71,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
     if config_entry.version == 1:
         new = {**config_entry.data}
-        new["port"] = 4202
+        new["port"] = 80
 
         config_entry.version = 2
         hass.config_entries.async_update_entry(config_entry, data=new)

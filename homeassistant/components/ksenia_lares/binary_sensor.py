@@ -1,4 +1,4 @@
-"""Component that provides support for Lares motion/door events."""
+"""Provides support for Lares motion/door events."""
 
 from datetime import timedelta
 import logging
@@ -45,7 +45,7 @@ async def async_setup_entry(
 
 
 class LaresBinarySensor(CoordinatorEntity, BinarySensorEntity):
-    """An implementation of a Lares door/window/motion sensor."""
+    """Implement a Lares door/window/motion sensor."""
 
     def __init__(self, coordinator, idx, description, device_info) -> None:
         """Initialize the sensor."""

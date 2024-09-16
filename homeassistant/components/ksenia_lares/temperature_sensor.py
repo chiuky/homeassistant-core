@@ -2,21 +2,18 @@
 
 from datetime import timedelta
 
-from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorEntity,
-    SensorStateClass,
-)
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DATA_COORDINATOR, DATA_TEMPERATURES, DOMAIN
 
 SCAN_INTERVAL = timedelta(seconds=10)
-DEFAULT_DEVICE_CLASS = SensorDeviceClass.TEMPERATURE
+DEFAULT_DEVICE_CLASS = "motion"
 
 
 async def async_setup_entry(
@@ -40,7 +37,7 @@ async def async_setup_entry(
     )
 
 
-class LaresTemperatureSensor(CoordinatorEntity, SensorEntity):
+class LaresTemperatureSensor(CoordinatorEntity, Entity):
     """Implementat of a Lares temperature sensor."""
 
     def __init__(self, coordinator, idx, description, device_info) -> None:
@@ -53,7 +50,7 @@ class LaresTemperatureSensor(CoordinatorEntity, SensorEntity):
 
         self._attr_icon = "mdi:shield"
         self._attr_device_info = device_info
-        self._attr_device_class = DEFAULT_DEVICE_CLASS
+        self._attr_device_class = SensorDeviceClass.TEMPERATURE
         self.attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         # Hide sensor if it has no description
