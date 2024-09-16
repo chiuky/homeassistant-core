@@ -309,6 +309,7 @@ FLOWS = {
         "konnected",
         "kostal_plenticore",
         "kraken",
+        "ksenia_lares",
         "kulersky",
         "lacrosse_view",
         "lamarzocco",

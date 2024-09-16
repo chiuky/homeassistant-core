@@ -3129,6 +3129,12 @@
       "integration_type": "virtual",
       "supported_by": "motion_blinds"
     },
+    "ksenia_lares": {
+      "name": "Ksenia Lares Alarm",
+      "integration_type": "hub",
+      "config_flow": true,
+      "iot_class": "local_polling"
+    },
     "kulersky": {
       "name": "Kuler Sky",
       "integration_type": "hub",

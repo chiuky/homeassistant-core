@@ -5,8 +5,11 @@ extend = "../pyproject.toml"
 extend-ignore = [
     "INP001", # File is part of an implicit namespace package. Add an `__init__.py`.
 ]
+ignore = ["D400"]
 
 [lint.isort]
 known-third-party = [
     "pylint",
 ]
+
+
