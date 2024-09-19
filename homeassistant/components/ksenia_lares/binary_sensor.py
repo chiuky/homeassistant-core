@@ -89,7 +89,7 @@ class LaresZoneSensor(CoordinatorEntity, BinarySensorEntity):
     @property
     def unique_id(self) -> str:
         """Return Unique ID string."""
-        return f"lares_zones_{self._idx}"
+        return f"lares_zone_{self._idx}"
 
     @property
     def name(self) -> str:

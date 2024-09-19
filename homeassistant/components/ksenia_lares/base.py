@@ -115,12 +115,16 @@ class LaresBase:
             response = await self.get("state/laresStatus.xml")
             if response is None:
                 return None
-            self._temperature_indoor = response.xpath(
-                "/laresStatus/temperature/indoor"
-            )[0].text
-            self._temperature_outdoor = response.xpath(
-                "/laresStatus/temperature/outdoor"
-            )[0].text
+            self._temperature_indoor = (
+                response.xpath("/laresStatus/temperature/indoor")[0]
+                .text.replace("C", "")
+                .strip()
+            )
+            self._temperature_outdoor = (
+                response.xpath("/laresStatus/temperature/outdoor")[0]
+                .text.replace("C", "")
+                .strip()
+            )
         return [
             {
                 "description": "lares_temperature_indoor",

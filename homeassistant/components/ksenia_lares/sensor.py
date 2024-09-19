@@ -39,44 +39,41 @@ async def async_setup_entry(
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
-    def _async_add_lares_sensors() -> None:
+    def addLaresSensors() -> None:
         partitionSensors = addLaresPartitionSensors(
             coordinator, partition_descriptions, device_info
         )
         temperatureSensors = addLaresTemperatureSensors(coordinator, device_info)
-        entities = []
-        entities.extend(partitionSensors)
-        entities.extend(temperatureSensors)
-        async_add_entities(entities)
+        partitionSensors.extend(temperatureSensors)
+        async_add_entities(partitionSensors)
 
     def addLaresPartitionSensors(coordinator, partition_descriptions, device_info):
         entities = []
         for idx, partition in enumerate(coordinator.data[DATA_PARTITIONS]):
-            if partition is not None:
+            if partition is not None and partition_descriptions[idx] is not None:
                 entities.append(
-                    [
-                        LaresPartitionSensor(
-                            coordinator,
-                            idx,
-                            partition_descriptions[idx],
-                            device_info,
-                        )
-                    ]
+                    LaresPartitionSensor(
+                        coordinator, idx, partition_descriptions[idx], device_info
+                    )
                 )
         return entities
 
     def addLaresTemperatureSensors(coordinator, device_info):
         entities = []
         for idx, temperature in enumerate(coordinator.data[DATA_TEMPERATURES]):
-            if temperature is not None:
+            if temperature is not None and temperature["description"] is not None:
                 entities.append(
                     LaresTemperatureSensor(
-                        coordinator, idx, temperature["description"], device_info
+                        coordinator,
+                        idx,
+                        temperature["description"],
+                        temperature["temperatureValue"],
+                        device_info,
                     )
                 )
         return entities
 
-    _async_add_lares_sensors()
+    addLaresSensors()
 
 
 class LaresPartitionSensor(CoordinatorEntity, SensorEntity):
@@ -111,7 +108,7 @@ class LaresPartitionSensor(CoordinatorEntity, SensorEntity):
     @property
     def unique_id(self) -> str:
         """Return Unique ID string."""
-        return f"lares_partitions_{self._idx}"
+        return f"lares_partition_{self._idx}"
 
     @property
     def name(self) -> str:
@@ -127,7 +124,9 @@ class LaresPartitionSensor(CoordinatorEntity, SensorEntity):
 class LaresTemperatureSensor(CoordinatorEntity, SensorEntity):
     """Implement a Lares temperature sensor."""
 
-    def __init__(self, coordinator, idx, description, device_info) -> None:
+    def __init__(
+        self, coordinator, idx, description, state: float | str | None, device_info
+    ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
 
@@ -140,6 +139,11 @@ class LaresTemperatureSensor(CoordinatorEntity, SensorEntity):
         self._attr_device_class = SensorDeviceClass.TEMPERATURE
         self.attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+
+        self._attr_native_value = state
+
+        self._attr_unique_id = f"larese_temperature_sensor_{idx}"
+
         # Hide sensor if it has no description
         is_inactive = not self._description
 
