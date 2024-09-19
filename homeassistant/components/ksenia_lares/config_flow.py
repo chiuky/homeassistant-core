@@ -8,7 +8,7 @@ import voluptuous as vol
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
-    FlowResult,
+    ConfigFlowResult,
     OptionsFlow,
 )
 from homeassistant.core import HomeAssistant, callback
@@ -69,7 +69,7 @@ class LaresConfigFlow(ConfigFlow, domain=DOMAIN):
         """Return the options flow."""
         return LaresOptionsFlowHandler(config_entry)
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(self, user_input=None) -> ConfigFlowResult:
         """Handle the initial step."""
         if user_input is None:
             return self.async_show_form(
@@ -109,7 +109,7 @@ class LaresOptionsFlowHandler(OptionsFlow):
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Manage the options."""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)

@@ -8,6 +8,7 @@ from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntityFeature,
     CodeFormat,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY,
     STATE_ALARM_ARMED_CUSTOM_BYPASS,
@@ -16,6 +17,8 @@ from homeassistant.const import (
     STATE_ALARM_ARMING,
     STATE_ALARM_DISARMED,
 )
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -40,7 +43,11 @@ _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=10)
 
 
-async def async_setup_entry(hass, config_entry, async_add_devices):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up alarm control panel of the Lares alarm device from a config entry."""
 
     coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
@@ -61,7 +68,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
-    async_add_devices(
+    async_add_entities(
         [
             LaresAlarmControlPanel(
                 coordinator,
@@ -106,7 +113,7 @@ class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
         return f"lares_panel_{name}"
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the name of this panel."""
         name = self._attr_device_info["name"]
         return f"Panel {name}"

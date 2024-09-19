@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 import logging
+from typing import Any
 
 from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -40,9 +41,7 @@ async def async_setup_entry(
     await coordinator.async_refresh()
 
     zones = coordinator.data[DATA_ZONES]
-    zones = filter(
-        lambda c: c is not None and c["status"] != ZONE_STATUS_NOT_USED, zones
-    )
+    zones = filter(lambda c: c["status"] != ZONE_STATUS_NOT_USED, zones)
 
     async_add_entities(
         LaresBypassSwitch(
@@ -93,7 +92,7 @@ class LaresBypassSwitch(CoordinatorEntity, SwitchEntity):
         status = self._coordinator.data[DATA_ZONES][self._idx]["bypass"]
         return status == ZONE_BYPASS_ON
 
-    async def async_turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs: Any) -> None:
         """Bypass the zone."""
         if self._pin is None:
             _LOGGER.error("Pin needed for bypass zone")
@@ -101,7 +100,7 @@ class LaresBypassSwitch(CoordinatorEntity, SwitchEntity):
 
         await self._coordinator.client.bypass_zone(self._idx, self._pin, True)
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs: Any) -> None:
         """Unbypass the zone."""
         if self._pin is None:
             _LOGGER.error("Pin needed for unbypass zone")

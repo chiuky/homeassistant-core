@@ -250,10 +250,12 @@ class LaresBase:
         url = f"{self._host}/xml/{path}"
 
         try:
-            async with aiohttp.ClientSession(auth=self._auth) as session:  # noqa: SIM117
-                async with session.get(url=url) as response:
-                    xml = await response.read()
-                    return etree.fromstring(xml)  # noqa: S320
+            async with (
+                aiohttp.ClientSession(auth=self._auth) as session,
+                session.get(url=url) as response,
+            ):
+                xml = await response.read()
+                return etree.fromstring(xml)  # noqa: S320
 
         except aiohttp.ClientConnectorError as conn_err:
             _LOGGER.debug("Host %s: Connection error %s", self._host, str(conn_err))
