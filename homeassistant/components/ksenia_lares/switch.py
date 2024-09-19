@@ -1,6 +1,5 @@
 """Provide support for Lares zone bypass."""
 
-from datetime import timedelta
 import logging
 from typing import Any
 
@@ -22,7 +21,6 @@ from .const import (
 from .coordinator import LaresDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(seconds=10)
 
 
 async def async_setup_entry(
@@ -41,17 +39,28 @@ async def async_setup_entry(
     await coordinator.async_refresh()
 
     zones = coordinator.data[DATA_ZONES]
-    zones = filter(lambda c: c["status"] != ZONE_STATUS_NOT_USED, zones)
 
-    async_add_entities(
-        LaresBypassSwitch(
-            coordinator, idx, zone_descriptions[idx], device_info, options
+    def _async_add_laresBypassSwitch() -> None:
+        zoneSensors = filterZoneSensors(
+            coordinator, zones, zone_descriptions, device_info
         )
-        for idx, zone in enumerate(zones)
-    )
+        async_add_entities(zoneSensors)
+
+    def filterZoneSensors(coordinator, zones, zone_descriptions, device_info):
+        entities = []
+        for idx, zone in enumerate(zones):
+            if zone is not None and zone["status"] != ZONE_STATUS_NOT_USED:
+                entities.append(
+                    LaresBypassSwitchSensor(
+                        coordinator, idx, zone_descriptions[idx], device_info, options
+                    )
+                )
+        return entities
+
+    _async_add_laresBypassSwitch()
 
 
-class LaresBypassSwitch(CoordinatorEntity, SwitchEntity):
+class LaresBypassSwitchSensor(CoordinatorEntity, SwitchEntity):
     """An implementation of a Lares zone bypass switch."""
 
     _attr_translation_key = "bypass"

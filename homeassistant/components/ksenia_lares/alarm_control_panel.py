@@ -1,6 +1,5 @@
 """Component that provides support for Lares alarm  control panel."""
 
-from datetime import timedelta
 import logging
 
 from homeassistant.components.alarm_control_panel import (
@@ -40,7 +39,6 @@ from .const import (
 from .coordinator import LaresDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(seconds=10)
 
 
 async def async_setup_entry(
@@ -70,7 +68,7 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            LaresAlarmControlPanel(
+            LaresAlarmControlPanelEntity(
                 coordinator,
                 device_info,
                 partition_descriptions,
@@ -81,7 +79,7 @@ async def async_setup_entry(
     )
 
 
-class LaresAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
+class LaresAlarmControlPanelEntity(CoordinatorEntity, AlarmControlPanelEntity):
     """An implementation of a Lares alarm control panel."""
 
     TYPE = DOMAIN

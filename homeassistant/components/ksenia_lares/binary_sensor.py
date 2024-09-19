@@ -1,6 +1,5 @@
 """Provides support for Lares motion/door events."""
 
-from datetime import timedelta
 import logging
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
@@ -26,10 +25,6 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-SCAN_INTERVAL = timedelta(seconds=10)
-
-DEFAULT_DEVICE_CLASS = "motion"
 
 
 async def async_setup_entry(
@@ -59,7 +54,7 @@ async def async_setup_entry(
         for idx, zone in enumerate(zones):
             if zone is not None and zone["status"] != ZONE_STATUS_NOT_USED:
                 entities.append(
-                    LaresBinarySensor(
+                    LaresZoneSensor(
                         coordinator, idx, zone_descriptions[idx], device_info
                     )
                 )
@@ -68,7 +63,7 @@ async def async_setup_entry(
     _async_add_lares_sensors()
 
 
-class LaresBinarySensor(CoordinatorEntity, BinarySensorEntity):
+class LaresZoneSensor(CoordinatorEntity, BinarySensorEntity):
     """Implement a Lares door/window/motion sensor."""
 
     def __init__(self, coordinator, idx, description, device_info) -> None:
@@ -80,7 +75,7 @@ class LaresBinarySensor(CoordinatorEntity, BinarySensorEntity):
         self._idx = idx
 
         self._attr_device_info = device_info
-        self._attr_device_class = DEFAULT_DEVICE_CLASS
+        self._attr_device_class = "motion"
 
         # Hide sensor if it is indicated as not used
         is_used = (

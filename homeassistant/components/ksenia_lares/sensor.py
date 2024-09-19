@@ -1,7 +1,5 @@
 """Provide support for Lares partitions."""
 
-from datetime import timedelta
-
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -25,9 +23,6 @@ from .const import (
     PARTITION_STATUS_DISARMED,
     PARTITION_STATUS_PENDING,
 )
-
-SCAN_INTERVAL = timedelta(seconds=10)
-DEFAULT_DEVICE_CLASS = "motion"
 
 
 async def async_setup_entry(
@@ -60,7 +55,7 @@ async def async_setup_entry(
             if partition is not None:
                 entities.append(
                     [
-                        LaresSensor(
+                        LaresPartitionSensor(
                             coordinator,
                             idx,
                             partition_descriptions[idx],
@@ -84,7 +79,7 @@ async def async_setup_entry(
     _async_add_lares_sensors()
 
 
-class LaresSensor(CoordinatorEntity, SensorEntity):
+class LaresPartitionSensor(CoordinatorEntity, SensorEntity):
     """Implement  a Lares partition sensor."""
 
     def __init__(self, coordinator, idx, description, device_info) -> None:
