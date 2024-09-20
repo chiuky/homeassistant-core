@@ -33,6 +33,7 @@ class LaresBase:
         self._scenario_descriptions = None
         self._temperature_indoor = None
         self._temperature_outdoor = None
+        self._output_descriptions = None
 
     async def info(self) -> dict | None:
         """Get general info."""
@@ -107,6 +108,36 @@ class LaresBase:
                 "bypass": zone.find("bypass").text,
             }
             for zone in zones
+        ]
+
+    async def output_descriptions(self):
+        """Get output descr zones."""
+        model = await self.get_model()
+        if self._output_descriptions is None:
+            self._output_descriptions = await self.get_descriptions(
+                f"outputs/outputsDescription{model}.xml", "/outputsDescription/output"
+            )
+
+        return self._output_descriptions
+
+    async def outputs(self):
+        """Get available zones."""
+        model = await self.get_model()
+        outputsStatus = await self.get(f"outputs/outputsStatus{model}.xml")
+
+        if outputsStatus is None:
+            return None
+
+        outputs = outputsStatus.xpath("/outputsStatus/output")
+
+        return [
+            {
+                "status": output.find("status").text,
+                "type": output.find("type").text,
+                "value": output.find("value").text,
+                "noPIN": output.find("noPIN").text,
+            }
+            for output in outputs
         ]
 
     async def temperatures(self):
@@ -213,6 +244,16 @@ class LaresBase:
         params = {
             "zoneId": zone + 1,  # Lares uses index starting with 1
             "zoneValue": 1 if bypass else 0,
+        }
+
+        return await self.send_command("setByPassZone", code, params)
+
+    async def switch_output(self, zone: int, code: str, status: bool) -> bool:
+        """Activate the given scenarios, requires the alarm code."""
+        # TODO implement the method
+        params = {
+            "zoneId": zone + 1,  # Lares uses index starting with 1
+            "zoneValue": 1 if status else 0,
         }
 
         return await self.send_command("setByPassZone", code, params)

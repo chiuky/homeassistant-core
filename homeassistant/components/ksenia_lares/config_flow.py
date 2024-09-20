@@ -36,6 +36,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Required("port", default=80): int,
         vol.Required("username"): str,
         vol.Required("password"): str,
+        vol.Required("scan_interval", default=10): int,
     }
 )
 
@@ -118,8 +119,6 @@ class LaresOptionsFlowHandler(OptionsFlow):
         select_partitions = {v: v for v in list(filter(None, partitions)) if v != ""}
 
         scenarios = await self.client.scenario_descriptions()
-        # scenarios_with_empty = [""] + scenarios
-        # TODO check se funziona altrimenti metti com'era prima
         scenarios_with_empty = ["", *scenarios]
         options = {
             vol.Optional(CONF_PIN): str,
