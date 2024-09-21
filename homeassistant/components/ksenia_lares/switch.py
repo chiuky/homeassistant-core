@@ -174,10 +174,9 @@ class LaresOutputSensor(CoordinatorEntity, SwitchEntity):
         self._attr_entity_registry_enabled_default = is_used
         self._attr_entity_registry_visible_default = is_used
 
-    @property
-    def is_on(self) -> bool | None:
+    def get_status(self) -> bool | None:
         """Return true if the output is on."""
-        status = self._coordinator.data[DATA_ZONES][self._idx]["status"]
+        status = self._coordinator.data[DATA_OUTPUTS][self._idx]["status"]
         isOn = status == OUTPUT_STATUS_ON
         if isOn:
             self._attr_icon = "mdi:lightbulb-on"
@@ -186,18 +185,28 @@ class LaresOutputSensor(CoordinatorEntity, SwitchEntity):
 
         return isOn
 
+    @property
+    def is_on(self) -> bool | None:
+        """Set a property related to the status."""
+        return self.get_status()
+
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Switch on the output."""
         if self._pin is None:
-            _LOGGER.error("Pin needed to switch on the output")
+            _LOGGER.error("Pin needed to switch ON the output")
             return
 
         await self._coordinator.client.switch_output(self._idx, self._pin, True)
+        await self._coordinator.async_refresh()
+        # await self._coordinator.client.outputs()  # refresh status
+        # self.get_status()  # update icon
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Switch off the output."""
         if self._pin is None:
-            _LOGGER.error("Pin needed to switch on the output")
+            _LOGGER.error("Pin needed to switch OFF the output")
             return
-
         await self._coordinator.client.switch_output(self._idx, self._pin, False)
+        await self._coordinator.async_refresh()
+        # await self._coordinator.client.outputs()  # refresh status
+        # self.get_status()  # update icon

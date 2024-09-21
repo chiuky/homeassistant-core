@@ -233,30 +233,29 @@ class LaresBase:
 
         return self._scenario_descriptions
 
-    async def activate_scenario(self, scenario: int, code: str) -> bool:
+    async def activate_scenario(self, scenario: int, pinCode: str) -> bool:
         """Activate the given scenarios, requires the alarm code."""
         params = {"macroId": scenario}
 
-        return await self.send_command("setMacro", code, params)
+        return await self.send_command("setMacro", pinCode, params)
 
-    async def bypass_zone(self, zone: int, code: str, bypass: bool) -> bool:
+    async def bypass_zone(self, zoneId: int, pinCode: str, bypass: bool) -> bool:
         """Activate the given scenarios, requires the alarm code."""
         params = {
-            "zoneId": zone + 1,  # Lares uses index starting with 1
+            "zoneId": zoneId + 1,  # Lares uses index starting with 1
             "zoneValue": 1 if bypass else 0,
         }
 
-        return await self.send_command("setByPassZone", code, params)
+        return await self.send_command("setByPassZone", pinCode, params)
 
-    async def switch_output(self, zone: int, code: str, status: bool) -> bool:
+    async def switch_output(self, outputId: int, pinCode: str, status: bool) -> bool:
         """Activate the given scenarios, requires the alarm code."""
-        # TODO implement the method
         params = {
-            "zoneId": zone + 1,  # Lares uses index starting with 1
-            "zoneValue": 1 if status else 0,
+            "outputId": outputId,  # Lares output uses index starting with 0
+            "outputValue": 255 if status else 0,
         }
 
-        return await self.send_command("setByPassZone", code, params)
+        return await self.send_command("setOutput", pinCode, params)
 
     async def get_model(self) -> str:
         """Get model information."""
@@ -273,11 +272,11 @@ class LaresBase:
         return self._model
 
     async def send_command(
-        self, command: str, code: str, params: dict[str, int]
+        self, command: str, pinCode: str, params: dict[str, int]
     ) -> bool:
         """Send Command."""
         urlparam = "".join(f"&{k}={v}" for k, v in params.items())
-        path = f"cmd/cmdOk.xml?cmd={command}&pin={code}&redirectPage=/xml/cmd/cmdError.xml{urlparam}"
+        path = f"cmd/cmdOk.xml?cmd={command}&pin={pinCode}&redirectPage=/xml/cmd/cmdError.xml{urlparam}"
 
         _LOGGER.debug("Sending command %s", path)
 
